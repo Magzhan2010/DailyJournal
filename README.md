@@ -16,6 +16,20 @@ Stack: Vite 8 · React 19 · Tailwind CSS v4 · Framer Motion · React Router.
 
 ---
 
+## Live
+
+| | |
+|---|---|
+| App | **https://daily-journal-magzhan2010.vercel.app** |
+| API | `https://my-note-api.vercel.app/journal` |
+| API repo | https://github.com/Magzhan2010/my-note-api (private) |
+
+The API URL comes from the `VITE_API_URL` environment variable (a Vercel env
+var in production, `.env.local` in development). Without it the app runs in
+local mode and keeps entries in `localStorage`.
+
+---
+
 ## Deploy
 
 The frontend is a static site, the API is not — they live in different places.
