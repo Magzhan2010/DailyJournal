@@ -2,8 +2,10 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 
-// https://vite.dev/config/
+// BASE_PATH is only needed when the site is served from a sub folder
+// (GitHub Pages project sites: /DailyJournal/). Leave it empty for the root.
 export default defineConfig({
+  base: process.env.BASE_PATH || '/',
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
