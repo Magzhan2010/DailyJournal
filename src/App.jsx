@@ -1,0 +1,30 @@
+import { Route, Routes } from 'react-router-dom'
+import { JournalProvider } from './lib/store'
+import Header from './components/Header'
+import Today from './pages/Today'
+import Entries from './pages/Entries'
+import EntryPage from './pages/EntryPage'
+import NewEntry from './pages/NewEntry'
+
+export default function App() {
+  return (
+    <JournalProvider>
+      <div className="relative min-h-screen">
+        {/* one soft blue wash in the corner */}
+        <div className="pointer-events-none absolute -right-32 -top-40 h-[420px] w-[420px] rounded-full bg-brand/10 blur-[100px] animate-drift" />
+
+        <Header />
+
+        <main className="relative mx-auto w-full max-w-[760px] px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
+          <Routes>
+            <Route path="/" element={<Today />} />
+            <Route path="/new" element={<NewEntry />} />
+            <Route path="/entries" element={<Entries />} />
+            <Route path="/entry/:id" element={<EntryPage />} />
+            <Route path="*" element={<Today />} />
+          </Routes>
+        </main>
+      </div>
+    </JournalProvider>
+  )
+}
