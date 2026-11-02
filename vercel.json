@@ -5,10 +5,6 @@
   "installCommand": "npm install",
   "rewrites": [
     {
-      "source": "/journal/:path*",
-      "destination": "https://my-note-api.onrender.com/journal/:path*"
-    },
-    {
       "source": "/((?!journal).*)",
       "destination": "/index.html"
     }
