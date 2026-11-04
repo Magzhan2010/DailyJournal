@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { useJournal } from '../lib/journal-context'
+import Logo from './Logo'
 
 const LINKS = [
   { to: '/', label: 'Today' },
@@ -18,11 +19,8 @@ export default function Header() {
     <header className="glass sticky top-0 z-30 border-b border-line">
       <div className="mx-auto flex h-16 max-w-[760px] items-center justify-between px-5 sm:px-8">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand text-white shadow-[0_4px_12px_rgba(0,113,227,0.28)]">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 20h9" />
-              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-            </svg>
+          <span className="grid h-9 w-9 place-items-center rounded-[11px] bg-brand text-white shadow-[0_4px_12px_rgba(0,113,227,0.28)]">
+            <Logo size={21} />
           </span>
           <span className="text-[16px] font-semibold tracking-[-0.02em] text-ink">My Note</span>
         </Link>

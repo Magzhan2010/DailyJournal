@@ -116,6 +116,8 @@ src/
 │   └── store.jsx           provider (entries, streak, save, delete)
 ├── components/
 │   ├── Header.jsx          top bar + the blue + button
+│   ├── Footer.jsx          sign-off: logo + Zhenis Magzhan
+│   ├── Logo.jsx            the pen-nib logo (SVG)
 │   ├── Editor.jsx          title + text + save
 │   └── EntryRow.jsx        one row in the list
 └── pages/

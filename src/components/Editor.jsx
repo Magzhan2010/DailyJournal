@@ -154,6 +154,21 @@ export default function Editor({
         <div className="flex items-center gap-2 text-[12.5px] font-medium text-ink-3">
           <span>{words} {words === 1 ? 'word' : 'words'}</span>
           <AnimatePresence>
+            {status === 'saving' && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5"
+              >
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
+                  className="h-2.5 w-2.5 rounded-full border-[1.5px] border-brand/25 border-t-brand"
+                />
+                Saving…
+              </motion.span>
+            )}
             {status === 'saved' && (
               <motion.span
                 initial={{ opacity: 0, x: -4 }}

@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { JournalProvider } from './lib/store'
 import Header from './components/Header'
+import Footer from './components/Footer'
 import Today from './pages/Today'
 import Entries from './pages/Entries'
 import EntryPage from './pages/EntryPage'
@@ -23,6 +24,8 @@ export default function App() {
             <Route path="/entry/:id" element={<EntryPage />} />
             <Route path="*" element={<Today />} />
           </Routes>
+
+          <Footer />
         </main>
       </div>
     </JournalProvider>
