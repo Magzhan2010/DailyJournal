@@ -19,9 +19,7 @@ export default function Header() {
     <header className="glass sticky top-0 z-30 border-b border-line">
       <div className="mx-auto flex h-16 max-w-[760px] items-center justify-between px-5 sm:px-8">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-[11px] bg-brand text-white shadow-[0_4px_12px_rgba(0,113,227,0.28)]">
-            <Logo size={21} />
-          </span>
+          <Logo size={28} variant="simple" className="rounded-[9px] shadow-[0_2px_10px_rgba(0,0,0,0.08)]" />
           <span className="text-[16px] font-semibold tracking-[-0.02em] text-ink">My Note</span>
         </Link>
 

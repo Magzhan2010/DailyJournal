@@ -5,8 +5,8 @@ import Logo from './Logo'
  */
 export default function Footer() {
   return (
-    <footer className="mt-16 flex items-center justify-center gap-2 border-t border-line/70 py-7 text-[12.5px] text-ink-3">
-      <Logo size={18} className="text-ink-3/80" />
+    <footer className="mt-12 flex items-center justify-center gap-1.5 border-t border-line/60 py-4 text-[11.5px] text-ink-3/80">
+      <Logo size={14} variant="simple" className="opacity-70" />
       <span>Zhenis Magzhan</span>
     </footer>
   )
