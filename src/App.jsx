@@ -9,7 +9,7 @@ import NewEntry from './pages/NewEntry'
 export default function App() {
   return (
     <JournalProvider>
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen bg-paper">
         {/* one soft blue wash in the corner */}
         <div className="pointer-events-none absolute -right-32 -top-40 h-[420px] w-[420px] rounded-full bg-brand/10 blur-[100px] animate-drift" />
 

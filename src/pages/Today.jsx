@@ -50,6 +50,7 @@ export default function Today() {
         entry={todayEntry}
         seed={seed}
         onSave={saveEntry}
+        onAutosave={saveEntry}
         autoFocus={!loading && !todayEntry}
       />
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +12,15 @@ export default function NewEntry() {
   const navigate = useNavigate()
   const { saveEntry } = useJournal()
   const [savedId, setSavedId] = useState(null)
+
+  const handleSave = useCallback(
+    async (draft) => {
+      const saved = await saveEntry(draft)
+      if (saved?.id) setSavedId(saved.id)
+      return saved
+    },
+    [saveEntry]
+  )
 
   return (
     <div className="animate-fade-up">
@@ -31,11 +40,8 @@ export default function NewEntry() {
       <Editor
         entry={null}
         autoFocus
-        onSave={async (draft) => {
-          const saved = await saveEntry(draft)
-          if (saved?.id) setSavedId(saved.id)
-          return saved
-        }}
+        onSave={handleSave}
+        onAutosave={handleSave}
       />
 
       {savedId && (

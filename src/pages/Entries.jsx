@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search } from 'lucide-react'
 import { useJournal } from '../lib/journal-context'
 import EntryRow from '../components/EntryRow'
 
 export default function Entries() {
   const { entries, loading } = useJournal()
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
+  const searchRef = useRef(null)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -15,6 +17,23 @@ export default function Entries() {
       [entry.title, entry.note].filter(Boolean).join(' ').toLowerCase().includes(q)
     )
   }, [entries, query])
+
+  /* "/" jumps to the search, Enter opens the first result */
+  useEffect(() => {
+    const onKey = (e) => {
+      const typing = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)
+      if (e.key === '/' && !typing) {
+        e.preventDefault()
+        searchRef.current?.focus()
+      }
+      if (e.key === 'Enter' && document.activeElement === searchRef.current && filtered[0]) {
+        e.preventDefault()
+        navigate(`/entry/${filtered[0].id}`)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [filtered, navigate])
 
   return (
     <div className="animate-fade-up space-y-6">
@@ -35,9 +54,10 @@ export default function Entries() {
               className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3"
             />
             <input
+              ref={searchRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search…"
+              placeholder="Search…  (press /)"
               className="field !h-10 !pl-9"
             />
           </div>

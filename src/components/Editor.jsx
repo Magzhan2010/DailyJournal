@@ -5,18 +5,31 @@ import { countWords } from '../lib/constants'
 
 /**
  * The writing surface: a title, the text, and a save button.
- * Saves automatically ~1s after you stop typing.
+ *
+ * Autosaves ~1s after you stop typing. The autosave is silent — it never
+ * closes the editor or navigates away — while the Save button calls `onSave`
+ * and is the only thing that finishes the edit.
  */
-export default function Editor({ entry = null, onSave, onCancel, autoFocus = false, seed = '' }) {
+export default function Editor({
+  entry = null,
+  onSave,
+  onAutosave,
+  onCancel,
+  autoFocus = false,
+  seed = '',
+}) {
   const [title, setTitle] = useState(entry?.title || '')
   const [note, setNote] = useState(entry?.note || '')
   const [status, setStatus] = useState('idle') // idle | saving | saved
   const [dirty, setDirty] = useState(false)
+  const [touched, setTouched] = useState(false)
   const [entryId, setEntryId] = useState(entry?.id || null)
+  const [syncedId, setSyncedId] = useState(entry?.id ?? null)
 
   const titleRef = useRef(null)
   const noteRef = useRef(null)
   const timer = useRef(null)
+  const saveRef = useRef(null)
 
   const grow = useCallback((el) => {
     if (!el) return
@@ -38,42 +51,75 @@ export default function Editor({ entry = null, onSave, onCancel, autoFocus = fal
     const text = String(seed || '').trim()
     if (text && !note.includes(text)) {
       setDirty(true)
+      setTouched(true)
       setNote((current) => `${text}\n\n${current}`.trim())
     }
   }
 
   // the entry can arrive after the first render (the list loads in the
   // background) — pick it up, but never overwrite what is being written
-  const incomingId = entry?.id ?? null
-  if (!title && !note && entry && incomingId !== entryId) {
-    setEntryId(incomingId)
+  if (entry && !touched && entry.id !== syncedId) {
+    setSyncedId(entry.id)
+    setEntryId(entry.id)
     setTitle(entry.title || '')
     setNote(entry.note || '')
   }
 
-  const save = useCallback(async () => {
-    if (!title.trim() && !note.trim()) return null
+  const save = useCallback(
+    async (silent = false) => {
+      if (!title.trim() && !note.trim()) return null
 
-    setStatus('saving')
-    const saved = await onSave({ id: entryId, title: title.trim(), note })
-    if (saved?.id) setEntryId(saved.id)
-    setDirty(false)
-    setStatus('saved')
-    return saved
-  }, [entryId, note, onSave, title])
+      setStatus('saving')
+      const handler = silent ? onAutosave || onSave : onSave
+      try {
+        const saved = await handler({ id: entryId, title: title.trim(), note })
+        if (saved?.id) setEntryId(saved.id)
+        setDirty(false)
+        setStatus('saved')
+        return saved
+      } catch (error) {
+        console.error(error)
+        setStatus('error')
+        return null
+      }
+    },
+    [entryId, note, onAutosave, onSave, title]
+  )
 
-  // autosave
+  // keep the latest save function without re-arming the autosave timer
+  useEffect(() => {
+    saveRef.current = save
+  }, [save])
+
+  // autosave — only the text matters here, the handler identity may change
+  // on every render of the parent
   useEffect(() => {
     if (!dirty) return undefined
     clearTimeout(timer.current)
-    timer.current = setTimeout(save, 1000)
+    timer.current = setTimeout(() => saveRef.current?.(true), 1000)
     return () => clearTimeout(timer.current)
-  }, [dirty, title, note, save])
+  }, [dirty, title, note])
+
+  /* keyboard: Cmd/Ctrl+Enter saves right away, Esc leaves the editor */
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault()
+        saveRef.current?.(false)
+      }
+      if (e.key === 'Escape' && onCancel) {
+        e.preventDefault()
+        onCancel()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onCancel])
 
   const words = countWords(note)
 
   return (
-    <div className="card overflow-hidden">
+    <div className="card overflow-hidden transition-shadow duration-300 focus-within:shadow-[0_10px_34px_rgba(0,113,227,0.10)]">
       <div className="px-6 pt-7 sm:px-8 sm:pt-8">
         <textarea
           ref={titleRef}
@@ -82,6 +128,7 @@ export default function Editor({ entry = null, onSave, onCancel, autoFocus = fal
           autoFocus={autoFocus}
           onChange={(e) => {
             setDirty(true)
+            setTouched(true)
             setStatus('idle')
             setTitle(e.target.value)
           }}
@@ -94,6 +141,7 @@ export default function Editor({ entry = null, onSave, onCancel, autoFocus = fal
           value={note}
           onChange={(e) => {
             setDirty(true)
+            setTouched(true)
             setStatus('idle')
             setNote(e.target.value)
           }}
@@ -117,6 +165,16 @@ export default function Editor({ entry = null, onSave, onCancel, autoFocus = fal
                 Saved
               </motion.span>
             )}
+            {status === 'error' && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-[#ff3b30]"
+              >
+                Not saved
+              </motion.span>
+            )}
           </AnimatePresence>
         </div>
 
@@ -126,7 +184,7 @@ export default function Editor({ entry = null, onSave, onCancel, autoFocus = fal
               Cancel
             </button>
           )}
-          <button type="button" onClick={save} className="btn btn-primary">
+          <button type="button" onClick={() => save(false)} className="btn btn-primary">
             <Save size={15} />
             Save
           </button>

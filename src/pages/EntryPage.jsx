@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Trash2 } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react'
 import { useJournal } from '../lib/journal-context'
 import { formatLongDate } from '../lib/constants'
 import Editor from '../components/Editor'
@@ -18,6 +18,38 @@ export default function EntryPage() {
     [entries, id]
   )
 
+  /* the Save button finishes the edit */
+  const handleSave = useCallback(
+    async (draft) => {
+      const saved = await saveEntry(draft)
+      if (saved) {
+        setEditing(false)
+        // the backend has no PUT endpoint, so an edit can create a new row
+        if (String(saved.id) !== String(id)) {
+          navigate(`/entry/${saved.id}`, { replace: true })
+        }
+      }
+      return saved
+    },
+    [id, navigate, saveEntry]
+  )
+
+  /* the autosave stays quiet — it must never close the editor */
+  const handleAutosave = useCallback(
+    async (draft) => saveEntry(draft),
+    [saveEntry]
+  )
+
+  const onDelete = async () => {
+    if (!confirming) {
+      setConfirming(true)
+      window.setTimeout(() => setConfirming(false), 3500)
+      return
+    }
+    await removeEntry(entry.id)
+    navigate('/entries')
+  }
+
   if (!entry) {
     return (
       <div className="animate-fade-up py-20 text-center">
@@ -28,16 +60,6 @@ export default function EntryPage() {
         </button>
       </div>
     )
-  }
-
-  const onDelete = async () => {
-    if (!confirming) {
-      setConfirming(true)
-      window.setTimeout(() => setConfirming(false), 3500)
-      return
-    }
-    await removeEntry(entry.id)
-    navigate('/entries')
   }
 
   return (
@@ -70,37 +92,57 @@ export default function EntryPage() {
       </div>
 
       {editing ? (
-        <Editor
-          entry={entry}
-          onSave={async (draft) => {
-            const saved = await saveEntry(draft)
-            if (saved) {
-              setEditing(false)
-              if (String(saved.id) !== String(id)) {
-                navigate(`/entry/${saved.id}`, { replace: true })
-              }
-            }
-            return saved
-          }}
-          onCancel={() => setEditing(false)}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+        >
+          <Editor
+            key={entry.id}
+            entry={entry}
+            onSave={handleSave}
+            onAutosave={handleAutosave}
+            onCancel={() => setEditing(false)}
+          />
+        </motion.div>
       ) : (
         <motion.article
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-          className="card px-6 py-8 sm:px-10 sm:py-10"
+          className="card group px-6 py-8 sm:px-10 sm:py-10"
         >
           <div className="text-[12px] font-medium uppercase tracking-[0.14em] text-ink-3">
             {formatLongDate(entry.date)}
           </div>
 
-          <h1 className="mt-2 text-[30px] font-semibold leading-[1.15] tracking-[-0.03em] text-ink sm:text-[36px]">
-            {entry.title || 'Untitled'}
-          </h1>
+          {/* click the title to edit it in place */}
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="group/title mt-2 block w-full text-left"
+          >
+            <h1 className="text-[30px] font-semibold leading-[1.15] tracking-[-0.03em] text-ink sm:text-[36px]">
+              {entry.title || 'Untitled'}
+            </h1>
+            <span className="mt-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-ink-3 opacity-0 transition-opacity group-hover/title:opacity-100">
+              <Pencil size={12} />
+              click to edit
+            </span>
+          </button>
 
-          <div className="prose mt-6">
-            {entry.note || <span className="italic text-ink-3">This entry is empty.</span>}
+          <div className="relative mt-4">
+            <div className="prose">
+              {entry.note || <span className="italic text-ink-3">This entry is empty.</span>}
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="absolute -top-8 right-0 hidden items-center gap-1 rounded-lg bg-mist px-2 py-1 text-[12px] font-medium text-ink-2 transition-colors hover:bg-brand-soft hover:text-brand-ink group-hover:inline-flex"
+            >
+              <Pencil size={12} />
+              Edit
+            </button>
           </div>
         </motion.article>
       )}
