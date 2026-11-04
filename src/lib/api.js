@@ -156,6 +156,12 @@ export async function listEntries() {
   return readStore().map(normalizeEntry)
 }
 
+/** Reads straight from local storage — used when the backend is unreachable. */
+export async function listLocalEntries() {
+  await sleep()
+  return readStore().map(normalizeEntry)
+}
+
 export async function createEntry(payload) {
   const body = { title: payload.title || '', note: payload.note || '' }
 

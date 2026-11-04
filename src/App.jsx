@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { JournalProvider } from './lib/store'
+import { useJournal } from './lib/journal-context'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Today from './pages/Today'
@@ -16,6 +17,8 @@ export default function App() {
 
         <Header />
 
+        <OfflineNotice />
+
         <main className="relative mx-auto w-full max-w-[760px] px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
           <Routes>
             <Route path="/" element={<Today />} />
@@ -29,5 +32,17 @@ export default function App() {
         </main>
       </div>
     </JournalProvider>
+  )
+}
+
+/** Never let sample entries look like real ones. */
+function OfflineNotice() {
+  const { offline } = useJournal()
+  if (!offline) return null
+
+  return (
+    <div className="relative z-20 border-b border-brand/15 bg-brand-soft/80 px-5 py-2.5 text-center text-[12.5px] text-brand-ink">
+      The backend is unreachable — these are sample entries, and new writes stay in this browser.
+    </div>
   )
 }

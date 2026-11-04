@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   listEntries,
+  listLocalEntries,
   createEntry,
   updateEntry,
   deleteEntry,
@@ -21,24 +22,32 @@ export function JournalProvider({ children }) {
   }, [entries])
 
   const refresh = useCallback(async () => {
-    try {
-      const data = await listEntries()
-      setEntries(sortEntries(data))
-      setOffline(false)
-      setLocalOnly(false)
-    } catch (err) {
-      console.warn('[my-note] local mode:', err.message)
-      setOffline(true)
-      setLocalOnly(true)
+    // the API can be cold after a pause, so give it a second chance
+    for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
-        const local = await listEntries()
-        setEntries(sortEntries(local))
-      } catch {
-        setEntries([])
+        const data = await listEntries()
+        setEntries(sortEntries(data))
+        setOffline(false)
+        setLocalOnly(false)
+        setLoading(false)
+        return
+      } catch (err) {
+        if (attempt === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 3500))
+          continue
+        }
+        console.warn('[my-note] local mode:', err.message)
+        setOffline(true)
+        setLocalOnly(true)
+        try {
+          const local = await listLocalEntries()
+          setEntries(sortEntries(local))
+        } catch {
+          setEntries([])
+        }
       }
-    } finally {
-      setLoading(false)
     }
+    setLoading(false)
   }, [])
 
   useEffect(() => {
