@@ -1,6 +1,7 @@
-# My Note — daily journal
+# Zuckonit — daily journal
 
-A quiet, Apple-inspired journal. Write the day down. Keep the streak. That's it.
+A LiveJournal-style daily journal. Raw markup, a B/I toolbar, and posts that
+land in a journal you can read back.
 
 ```bash
 npm install
@@ -85,44 +86,49 @@ pointing `/journal/:path*` at your backend (see `vercel.json`), or set
 
 ## The app
 
-| Route        | What it is                                       |
-| ------------ | ------------------------------------------------ |
-| `/`          | **Today** — date, one prompt, the editor, recent |
-| `/new`       | **New entry** — the blue `+` button opens this    |
-| `/entries`   | Every entry, with search                         |
-| `/entry/:id` | Read / edit / delete one entry                   |
+| Route        | What it is                                          |
+| ------------ | --------------------------------------------------- |
+| `/`          | **Make a post** — the LiveJournal composer + recent entries |
+| `/entries`   | **View journal** — every entry, searchable          |
+| `/entry/:id` | One entry, read or edit                             |
 
-**Design notes**
+**Design notes — the 2003 LiveJournal look**
 
-- Type: real SF Pro on Apple devices (`-apple-system` first in the stack),
-  Inter Variable everywhere else — locally bundled, no network request.
-- Blue & white: `#0071e3` on `#ffffff`, Apple's system greys for surfaces.
-- Motion, kept small: page fade-in, rows that stagger in, a soft blue wash in
-  the corner, a button that presses. All of it collapses under
-  `prefers-reduced-motion`.
-- The editor autosaves ~1s after you stop typing, and says “Saved” when it does.
-- Click the prompt to drop it into the entry as the first line.
+- **"Post to _Zuckonit_"** in the SixApart steel blue, with the journal name in
+  bold italic Georgia, exactly like the old post page.
+- **Raw markup.** Posts are stored as HTML the way LiveJournal stored them, and
+  the box opens with `<p><i>8:13pm</i>. ` already in it. `</p>` is closed for you
+  when you post.
+- **The B / I / smiley toolbar** actually wraps your selection in `<b>`, `<i>`
+  or drops in a `:)`.
+- **The grey Post button** with the blue up-arrow, top right.
+- Square corners, 1px `#b8b8b8` frames, `Courier New` in the editor, a serif
+  wordmark, and a footer that reads *"Zuckonit — powered by my note"*.
+- Motion is deliberately minimal — it is a 2003 blog, not a dashboard.
+
+The reading view renders the markup safely (only `p`, `i`, `b`, `em`, `br`, `a`
+and friends survive; scripts and `on*` handlers do not).
 
 ### Structure
 
 ```
 src/
 ├── App.jsx                 routes + layout
-├── index.css               Tailwind theme (colours, type, motion)
+├── index.css               the LiveJournal theme (colours, type, chrome)
 ├── lib/
 │   ├── api.js              backend adapter + localStorage fallback
 │   ├── constants.js        prompts, date helpers
+│   ├── journal-markup.js   the <p><i>time</i>. prefix and emptiness check
 │   ├── journal-context.js  context + useJournal hook
+│   ├── sanitize.js         keeps the raw markup safe to render
 │   └── store.jsx           provider (entries, streak, save, delete)
 ├── components/
-│   ├── Header.jsx          top bar + the blue + button
-│   ├── Footer.jsx          sign-off: logo + Zhenis Magzhan
-│   ├── Logo.jsx            the pen-nib logo (SVG)
-│   ├── Editor.jsx          title + text + save
-│   └── EntryRow.jsx        one row in the list
+│   ├── SiteHeader.jsx      Zuckonit + "Make a post / View journal"
+│   ├── PostComposer.jsx    the post box with the B / I toolbar
+│   ├── JournalPost.jsx     one entry in the journal
+│   └── Logo.jsx            the mashup mark (Apple, Meta, NVIDIA, Claude, Google, Codex)
 └── pages/
-    ├── Today.jsx
-    ├── NewEntry.jsx
-    ├── Entries.jsx
-    └── EntryPage.jsx
+    ├── Today.jsx           make a post + recent entries
+    ├── Entries.jsx         the whole journal
+    └── EntryPage.jsx       one entry
 ```
