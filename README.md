@@ -1,4 +1,4 @@
-# Zuckonit — daily journal
+# magishoit — daily journal
 
 A LiveJournal-style daily journal. Raw markup, a B/I toolbar, and posts that
 land in a journal you can read back.
@@ -94,7 +94,7 @@ pointing `/journal/:path*` at your backend (see `vercel.json`), or set
 
 **Design notes — the 2003 LiveJournal look**
 
-- **"Post to _Zuckonit_"** in the SixApart steel blue, with the journal name in
+- **"Post to _magishoit_"** in the SixApart steel blue, with the journal name in
   bold italic Georgia, exactly like the old post page.
 - **Raw markup.** Posts are stored as HTML the way LiveJournal stored them, and
   the box opens with `<p><i>8:13pm</i>. ` already in it. `</p>` is closed for you
@@ -103,7 +103,7 @@ pointing `/journal/:path*` at your backend (see `vercel.json`), or set
   or drops in a `:)`.
 - **The grey Post button** with the blue up-arrow, top right.
 - Square corners, 1px `#b8b8b8` frames, `Courier New` in the editor, a serif
-  wordmark, and a footer that reads *"Zuckonit — powered by my note"*.
+  wordmark, and a footer that reads *"magishoit — powered by my note"*.
 - Motion is deliberately minimal — it is a 2003 blog, not a dashboard.
 
 The reading view renders the markup safely (only `p`, `i`, `b`, `em`, `br`, `a`
@@ -123,7 +123,7 @@ src/
 │   ├── sanitize.js         keeps the raw markup safe to render
 │   └── store.jsx           provider (entries, streak, save, delete)
 ├── components/
-│   ├── SiteHeader.jsx      Zuckonit + "Make a post / View journal"
+│   ├── SiteHeader.jsx      magishoit + "Make a post / View journal"
 │   ├── PostComposer.jsx    the post box with the B / I toolbar
 │   ├── JournalPost.jsx     one entry in the journal
 │   └── Logo.jsx            the mashup mark (Apple, Meta, NVIDIA, Claude, Google, Codex)

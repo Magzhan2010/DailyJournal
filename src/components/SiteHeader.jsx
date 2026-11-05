@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import Logo from './Logo'
+import { SITE_NAME } from '../lib/constants'
 
 const LINKS = [
   { to: '/', label: 'Make a post' },
@@ -18,7 +19,7 @@ export default function SiteHeader() {
         <Link to="/" className="flex items-center gap-2.5">
           <Logo size={22} variant="simple" className="rounded-[4px]" />
           <span className="font-serif text-[19px] font-bold italic tracking-[-0.01em] text-[var(--color-lj-blue)]">
-            Zuckonit
+            {SITE_NAME}
           </span>
         </Link>
 

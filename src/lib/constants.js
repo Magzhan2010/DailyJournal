@@ -2,6 +2,9 @@
  * Small helpers: prompts, dates, word counts.
  */
 
+/** The journal's name — 2003 LiveJournal style: a name + "oit". */
+export const SITE_NAME = 'magishoit'
+
 export const PROMPTS = [
   'What are you building that nobody else can see yet?',
   'What did you learn today that changes a decision?',

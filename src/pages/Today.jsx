@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useJournal } from '../lib/journal-context'
-import { PROMPTS } from '../lib/constants'
+import { PROMPTS, SITE_NAME } from '../lib/constants'
 import PostComposer from '../components/PostComposer'
 import JournalPost from '../components/JournalPost'
 
@@ -81,7 +81,7 @@ export default function Today() {
 
       {/* the classic footer */}
       <footer className="mt-6 border-t border-[var(--color-line-soft)] py-4 text-center text-[11.5px] text-[var(--color-ink-4)]">
-        Zuckonit — powered by my note · © Zhenis Magzhan
+        {SITE_NAME} — powered by my note · © Zhenis Magzhan
       </footer>
     </div>
   )

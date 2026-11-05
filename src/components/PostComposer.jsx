@@ -3,9 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUp, Check } from 'lucide-react'
 import Logo from './Logo'
 import { isEmptyMarkup, postPrefix } from '../lib/journal-markup'
+import { SITE_NAME } from '../lib/constants'
 
 /**
- * The post box — "Post to Zuckonit", with the old B / I / smiley toolbar and
+ * The post box - "Post to magishoit", with the old B / I / smiley toolbar and
  * the grey Post button.
  */
 export default function PostComposer({
@@ -132,7 +133,7 @@ export default function PostComposer({
       {/* heading + toolbar + post button */}
       <div className="flex flex-wrap items-center gap-4 border-b border-[var(--color-line-soft)] px-4 py-4">
         <h1 className="lj-heading">
-          Post to <em>Zuckonit</em>
+          Post to <em>{SITE_NAME}</em>
         </h1>
 
         <div className="ml-auto flex items-center gap-2">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useJournal } from '../lib/journal-context'
+import { SITE_NAME } from '../lib/constants'
 import JournalPost from '../components/JournalPost'
 
 export default function Entries() {
@@ -36,7 +37,7 @@ export default function Entries() {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line-soft)] px-5 py-4">
           <div>
             <h1 className="font-serif text-[24px] font-bold italic text-[var(--color-lj-blue)]">
-              Zuckonit
+              {SITE_NAME}
             </h1>
             <p className="mt-0.5 text-[12px] text-[var(--color-ink-4)]">
               {entries.length} {entries.length === 1 ? 'entry' : 'entries'} in this journal
@@ -80,7 +81,7 @@ export default function Entries() {
       </div>
 
       <footer className="mt-6 border-t border-[var(--color-line-soft)] py-4 text-center text-[11.5px] text-[var(--color-ink-4)]">
-        Zuckonit — powered by my note · © Zhenis Magzhan
+        {SITE_NAME} — powered by my note · © Zhenis Magzhan
       </footer>
     </div>
   )
