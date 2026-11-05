@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useJournal } from '../lib/journal-context'
-import EntryRow from '../components/EntryRow'
+import JournalPost from '../components/JournalPost'
 
 export default function Entries() {
-  const { entries, loading } = useJournal()
+  const { entries, loading, removeEntry } = useJournal()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const searchRef = useRef(null)
@@ -14,11 +13,11 @@ export default function Entries() {
     const q = query.trim().toLowerCase()
     if (!q) return entries
     return entries.filter((entry) =>
-      [entry.title, entry.note].filter(Boolean).join(' ').toLowerCase().includes(q)
+      String(entry.note || '').replace(/<[^>]*>/g, ' ').toLowerCase().includes(q)
     )
   }, [entries, query])
 
-  /* "/" jumps to the search, Enter opens the first result */
+  /* "/" jumps to the search */
   useEffect(() => {
     const onKey = (e) => {
       const typing = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)
@@ -26,75 +25,63 @@ export default function Entries() {
         e.preventDefault()
         searchRef.current?.focus()
       }
-      if (e.key === 'Enter' && document.activeElement === searchRef.current && filtered[0]) {
-        e.preventDefault()
-        navigate(`/entry/${filtered[0].id}`)
-      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [filtered, navigate])
+  }, [])
 
   return (
-    <div className="animate-fade-up space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-[30px] font-semibold leading-none tracking-[-0.03em] text-ink sm:text-[34px]">
-            Entries
-          </h1>
-          <p className="mt-2 text-[14px] text-ink-2">
-            {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
-          </p>
-        </div>
+    <div className="mx-auto max-w-[860px]">
+      <div className="lj-frame">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line-soft)] px-5 py-4">
+          <div>
+            <h1 className="font-serif text-[24px] font-bold italic text-[var(--color-lj-blue)]">
+              Zuckonit
+            </h1>
+            <p className="mt-0.5 text-[12px] text-[var(--color-ink-4)]">
+              {entries.length} {entries.length === 1 ? 'entry' : 'entries'} in this journal
+            </p>
+          </div>
 
-        <div className="flex w-full items-center gap-2 sm:w-auto">
-          <div className="relative flex-1 sm:w-[240px]">
-            <Search
-              size={15}
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3"
-            />
+          <div className="relative w-full sm:w-[260px]">
             <input
               ref={searchRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search…  (press /)"
-              className="field !h-10 !pl-9"
+              placeholder="Search the journal…  (press /)"
+              className="lj-input"
             />
           </div>
+        </div>
 
-          <Link
-            to="/new"
-            title="New entry"
-            aria-label="New entry"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand text-white shadow-[0_4px_12px_rgba(0,113,227,0.28)] transition-transform duration-200 hover:scale-105 hover:bg-brand-hover active:scale-95"
-          >
-            <Plus size={16} strokeWidth={2.5} />
-          </Link>
+        <div className="px-5 pb-3">
+          {loading ? (
+            <div className="space-y-4 py-5">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-14 animate-pulse rounded bg-[var(--color-panel)]" />
+              ))}
+            </div>
+          ) : filtered.length ? (
+            filtered.map((entry, index) => (
+              <JournalPost
+                key={entry.id}
+                entry={entry}
+                index={index}
+                onEdit={() => navigate(`/entry/${entry.id}`)}
+                onDelete={() => removeEntry(entry.id)}
+              />
+            ))
+          ) : (
+            <p className="py-12 text-center text-[13px] text-[var(--color-ink-4)]">
+              {query ? 'Nothing in the journal matches that.' : 'The journal is empty.'}
+            </p>
+          )}
         </div>
-      </header>
+      </div>
 
-      {loading ? (
-        <div className="space-y-2">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-14 animate-pulse rounded-2xl bg-mist" />
-          ))}
-        </div>
-      ) : filtered.length ? (
-        <div className="-mx-4 space-y-0.5">
-          {filtered.map((entry, index) => (
-            <EntryRow key={entry.id} entry={entry} index={index} />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-line px-6 py-14 text-center">
-          <p className="text-[15px] font-medium text-ink">
-            {query ? 'Nothing matches that search' : 'No entries yet'}
-          </p>
-          <p className="mt-1 text-[13.5px] text-ink-3">
-            {query ? 'Try another word.' : 'Write your first one on the Today page.'}
-          </p>
-        </div>
-      )}
+      <footer className="mt-6 border-t border-[var(--color-line-soft)] py-4 text-center text-[11.5px] text-[var(--color-ink-4)]">
+        Zuckonit — powered by my note · © Zhenis Magzhan
+      </footer>
     </div>
   )
 }
