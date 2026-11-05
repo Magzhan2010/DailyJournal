@@ -64,12 +64,21 @@ export default function PostComposer({
     const start = el.selectionStart
     const end = el.selectionEnd
     const selected = value.slice(start, end)
-    const next = `${value.slice(0, start)}<${tag}>${selected}</${tag}>${value.slice(end)}`
+
+    // nothing selected: drop the cursor between the tags
+    const next = selected
+      ? `${value.slice(0, start)}<${tag}>${selected}</${tag}>${value.slice(end)}`
+      : `${value.slice(0, start)}<${tag}></${tag}>${value.slice(end)}`
+
     setValue(next)
     setDirty(true)
     requestAnimationFrame(() => {
       el.focus()
-      el.setSelectionRange(start + tag.length + 2, end + tag.length + 2)
+      if (selected) {
+        el.setSelectionRange(start + tag.length + 2, end + tag.length + 2)
+      } else {
+        el.setSelectionRange(start + tag.length + 1, start + tag.length + 1)
+      }
     })
   }
 
